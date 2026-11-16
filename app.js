@@ -49,7 +49,36 @@ function getCurrentUser() {
 }
 
 function getFavorites() {
-  return readJSON(STORAGE_KEYS.favorites, []);
+  const currentUser = getCurrentUser();
+  const scope = currentUser?.email ? encodeURIComponent(currentUser.email.toLowerCase()) : "guest";
+  return readJSON(`spinpoint-favorites-${scope}`, []);
+}
+
+function saveFavorites(favorites) {
+  const currentUser = getCurrentUser();
+  const scope = currentUser?.email ? encodeURIComponent(currentUser.email.toLowerCase()) : "guest";
+  return writeJSON(`spinpoint-favorites-${scope}`, favorites);
+}
+
+function migrateFavoritesToAccount(email) {
+  const normalizedEmail = email.toLowerCase();
+  const accountKey = `spinpoint-favorites-${encodeURIComponent(normalizedEmail)}`;
+  const accountFavorites = readJSON(accountKey, []);
+  const guestFavorites = readJSON("spinpoint-favorites-guest", []);
+  const legacyFavorites = readJSON(STORAGE_KEYS.favorites, []);
+  const merged = [...accountFavorites];
+
+  [...guestFavorites, ...legacyFavorites].forEach(item => {
+    if (item && !merged.some(saved => saved.id === item.id)) merged.push(item);
+  });
+
+  writeJSON(accountKey, merged);
+  try {
+    localStorage.removeItem("spinpoint-favorites-guest");
+    localStorage.removeItem(STORAGE_KEYS.favorites);
+  } catch (error) {
+    console.warn("Could not remove old favourite data.", error);
+  }
 }
 
 function getBookings() {
@@ -161,7 +190,7 @@ function createSessionCard(session) {
       ? favorites.filter(item => item.id !== session.id)
       : [...favorites, { id: session.id, name: session.name, day: session.day, time: session.time, level: session.level, price: session.price }];
 
-    writeJSON(STORAGE_KEYS.favorites, updated);
+    saveFavorites(updated);
     favoriteButton.setAttribute("aria-pressed", String(!exists));
     favoriteButton.textContent = exists ? "♡ Save" : "♥ Saved";
     favoriteButton.setAttribute("aria-label", `${exists ? "Add" : "Remove"} ${session.name} ${exists ? "to" : "from"} favourites`);
@@ -393,6 +422,7 @@ function setupAccountForms() {
       }
 
       writeJSON(STORAGE_KEYS.currentUser, { name, email });
+      migrateFavoritesToAccount(email);
       setMessage(message, "Account created successfully. Your profile is ready.", "success");
       signupForm.reset();
       showProfile();
@@ -423,6 +453,7 @@ function setupAccountForms() {
       }
 
       writeJSON(STORAGE_KEYS.currentUser, { name: user.name, email: user.email });
+      migrateFavoritesToAccount(email);
       setMessage(message, "Login successful. Your profile is now open.", "success");
       loginForm.reset();
       showProfile();
@@ -464,7 +495,7 @@ function renderProfile() {
       remove.className = "btn btn-sm btn-outline-danger";
       remove.textContent = "Remove";
       remove.addEventListener("click", () => {
-        writeJSON(STORAGE_KEYS.favorites, getFavorites().filter(entry => entry.id !== favorite.id));
+        saveFavorites(getFavorites().filter(entry => entry.id !== favorite.id));
         renderProfile();
       });
       item.append(info, remove);
@@ -482,7 +513,7 @@ function renderProfile() {
   } else {
     const table = document.createElement("table");
     table.className = "table align-middle";
-    table.innerHTML = "<thead><tr><th>Booking ID</th><th>Date</th><th>Training</th><th>Level</th></tr></thead>";
+    table.innerHTML = "<thead><tr><th>Booking ID</th><th>Date</th><th>Training</th><th>Level</th><th>Action</th></tr></thead>";
     const body = document.createElement("tbody");
     bookings.slice().reverse().forEach(booking => {
       const row = document.createElement("tr");
@@ -491,6 +522,18 @@ function renderProfile() {
         cell.textContent = value;
         row.appendChild(cell);
       });
+      const actionCell = document.createElement("td");
+      const removeBooking = document.createElement("button");
+      removeBooking.type = "button";
+      removeBooking.className = "btn btn-sm btn-outline-danger";
+      removeBooking.textContent = "Remove";
+      removeBooking.setAttribute("aria-label", `Remove booking ${booking.id}`);
+      removeBooking.addEventListener("click", () => {
+        const remaining = getBookings().filter(item => item.id !== booking.id);
+        if (writeJSON(STORAGE_KEYS.bookings, remaining)) renderProfile();
+      });
+      actionCell.appendChild(removeBooking);
+      row.appendChild(actionCell);
       body.appendChild(row);
     });
     table.appendChild(body);
@@ -523,7 +566,7 @@ function setupProfileActions() {
   });
 
   document.getElementById("clearFavorites")?.addEventListener("click", () => {
-    writeJSON(STORAGE_KEYS.favorites, []);
+    saveFavorites([]);
     renderProfile();
   });
 

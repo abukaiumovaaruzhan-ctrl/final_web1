@@ -60,7 +60,13 @@
         <div class="row g-4 mt-2">
           <div class="col-lg-5"><div class="profile-card"><h3>Account details</h3><p><strong>Name:</strong> <span id="profileEmailName"></span></p><p><strong>Email:</strong> <span id="profileEmail"></span></p><p><strong>Saved sessions:</strong> <span id="profileFavoriteCount">0</span></p><p><strong>Bookings:</strong> <span id="profileBookingCount">0</span></p></div></div>
           <div class="col-lg-7"><div class="profile-card"><div class="d-flex justify-content-between align-items-center gap-2"><h3>Favourite sessions</h3><button id="clearFavorites" class="btn btn-sm btn-outline-danger" type="button">Clear all</button></div><div id="profileFavorites" class="saved-list mt-3"></div></div></div>
-          <div class="col-12"><div class="profile-card"><h3>Booking history</h3><div id="bookingHistory" class="table-responsive"></div></div></div>
+          <div class="col-12"><div class="profile-card">
+            <div class="d-flex justify-content-between align-items-center gap-3 flex-wrap">
+              <h3 class="mb-0">Booking history</h3>
+              <button id="clearBookings" class="btn btn-sm btn-outline-danger" type="button">Clear history</button>
+            </div>
+            <div id="bookingHistory" class="table-responsive mt-3"></div>
+          </div></div>
         </div>
       </section>
     </div></section>
