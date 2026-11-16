@@ -1,0 +1,423 @@
+/* ============================================
+   SPINPOINT — POV TABLE TENNIS SCENE
+   Realistic table + synced rally (no game)
+============================================ */
+
+.tt-pov-scene {
+  position: relative;
+  min-height: 480px;
+  overflow: hidden;
+  border-radius: 24px;
+  isolation: isolate;
+  background:
+    radial-gradient(ellipse at 50% 10%, rgba(41,130,200,.25), transparent 55%),
+    radial-gradient(ellipse at 50% 105%, rgba(0,0,0,.7), transparent 65%),
+    linear-gradient(180deg, #071426 0%, #0d2140 45%, #040d1c 100%);
+  box-shadow:
+    0 30px 70px rgba(3,12,25,.4),
+    inset 0 1px 0 rgba(255,255,255,.1);
+}
+
+/* --- Lights --- */
+.tt-pov-light {
+  position: absolute;
+  top: 22px;
+  width: 90px;
+  height: 5px;
+  border-radius: 50%;
+  background: #e8f5ff;
+  box-shadow: 0 0 12px #fff, 0 0 36px #54aaff, 0 0 72px rgba(84,170,255,.55);
+  animation: povLightPulse 3s ease-in-out infinite alternate;
+  z-index: 2;
+}
+.tt-pov-light-l { left: 20%; }
+.tt-pov-light-r { right: 18%; animation-delay: 1.5s; }
+
+@keyframes povLightPulse {
+  from { opacity: .55; }
+  to   { opacity: 1; }
+}
+
+/* --- Caption --- */
+.tt-pov-caption {
+  position: absolute;
+  top: 26px;
+  left: 30px;
+  z-index: 15;
+  pointer-events: none;
+}
+.tt-pov-eyebrow {
+  color: #ff6570;
+  font-size: .68rem;
+  font-weight: 800;
+  letter-spacing: 2.5px;
+}
+.tt-pov-caption h3 {
+  margin: 8px 0 4px;
+  font-family: 'Manrope', sans-serif;
+  font-size: clamp(1.6rem, 4vw, 2.4rem);
+  font-weight: 800;
+  color: #fff;
+  line-height: 1.1;
+}
+.tt-pov-caption p {
+  margin: 0;
+  color: #b9cce0;
+  font-size: .88rem;
+}
+
+/* --- Stage --- */
+.tt-pov-stage {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* --- Floor glow --- */
+.tt-pov-floor-glow {
+  position: absolute;
+  left: 15%;
+  right: 15%;
+  bottom: -5%;
+  height: 30%;
+  background: radial-gradient(ellipse at center, rgba(64,150,220,.25), transparent 65%);
+  filter: blur(20px);
+  z-index: 0;
+}
+
+/* --- Table shadow on floor --- */
+.tt-pov-table-shadow {
+  position: absolute;
+  left: 22%;
+  right: 22%;
+  bottom: 2%;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(0,0,0,.65);
+  filter: blur(22px);
+  z-index: 1;
+}
+
+/* ==========================
+   TABLE (perspective + depth)
+========================== */
+.tt-pov-table {
+  position: absolute;
+  left: 20%;
+  right: 20%;
+  bottom: 8%;
+  height: 50%;
+  z-index: 3;
+}
+
+/* Legs */
+.tt-pov-table-legs {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+.tt-leg {
+  position: absolute;
+  bottom: -10%;
+  width: 2.5%;
+  height: 18%;
+  border-radius: 2px;
+  background: linear-gradient(180deg, #4a5a6a 0%, #1a2530 55%, #0a1520 100%);
+  box-shadow: 3px 3px 8px rgba(0,0,0,.6);
+}
+.tt-leg-bl { left: 12%; }
+.tt-leg-br { right: 12%; }
+
+/* Surface */
+.tt-pov-table-surface {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  box-sizing: border-box;
+  border-top: 3px solid #eaf4ff;
+  border-bottom: 3px solid #eaf4ff;
+  clip-path: polygon(35% 0%, 65% 0%, 100% 100%, 0% 100%);
+
+  background:
+    /* блик сверху-слева */
+    radial-gradient(ellipse at 28% 15%, rgba(255,255,255,.28), transparent 45%),
+    /* мягкий свет */
+    linear-gradient(180deg, rgba(255,255,255,.08), transparent 20%),
+    /* основной градиент стола */
+    linear-gradient(180deg, #3a9bdc 0%, #1a6eb0 50%, #0a4a80 100%);
+
+  box-shadow:
+    inset 0 0 80px rgba(0,0,0,.35),
+    inset 0 2px 6px rgba(255,255,255,.15);
+}
+
+/* Center line */
+.tt-pov-table-surface::before {
+  content: "";
+  position: absolute;
+  top: 4%;
+  bottom: 4%;
+  left: 50%;
+  width: 1.5px;
+  transform: translateX(-50%);
+  background: rgba(255,255,255,.75);
+}
+
+/* Far end line */
+.tt-pov-table-surface::after {
+  content: "";
+  position: absolute;
+  top: 4%;
+  left: 35%;
+  right: 35%;
+  height: 1.5px;
+  background: rgba(255,255,255,.75);
+}
+
+/* ==========================
+   NET — correct position, in front of surface, with shadow
+========================== */
+.tt-pov-net {
+  position: absolute;
+  left: 17.5%;
+  right: 17.5%;
+  top: 44%;
+  height: 6%;
+  z-index: 5;
+
+  clip-path: polygon(2% 0%, 98% 0%, 100% 100%, 0% 100%);
+
+  background:
+    repeating-linear-gradient(0deg,
+      rgba(255,255,255,.55) 0 1px,
+      transparent 1px 3px),
+    repeating-linear-gradient(90deg,
+      rgba(255,255,255,.5) 0 1px,
+      transparent 1px 3px),
+    rgba(9,22,37,.8);
+
+  box-shadow:
+    0 4px 10px rgba(0,0,0,.55),
+    0 0 1px rgba(255,255,255,.3);
+}
+
+/* Top white tape */
+.tt-pov-net::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 2px;
+  background: #f7fbff;
+  box-shadow: 0 1px 2px rgba(255,255,255,.4);
+  z-index: 1;
+}
+
+/* Soft shadow of the net on the table below */
+.tt-pov-net::after {
+  content: "";
+  position: absolute;
+  left: 2%;
+  right: 2%;
+  top: 100%;
+  height: 40%;
+  background: radial-gradient(ellipse at center, rgba(0,0,0,.35), transparent 70%);
+  filter: blur(3px);
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* Posts */
+.tt-pov-net-post {
+  position: absolute;
+  top: -4px;
+  bottom: -1px;
+  width: 4px;
+  border-radius: 1px;
+  background: linear-gradient(90deg, #0a1622 0%, #7a8fa3 50%, #0a1622 100%);
+  box-shadow: 1px 0 4px rgba(0,0,0,.5);
+  z-index: 2;
+}
+.tt-pov-net-post-l { left: -2px; }
+.tt-pov-net-post-r { right: -2px; }
+
+/* ==========================
+   BALL — flies far→near→far, edges of table
+========================== */
+.tt-pov-ball {
+  position: absolute;
+  top: 44%;
+  left: 50%;
+  width: 18px;
+  height: 18px;
+  margin-left: -9px;
+  margin-top: -9px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 32% 28%, #fff 0%, #e8eef5 55%, #9eb1c4 100%);
+  box-shadow:
+    0 0 12px rgba(255,255,255,.9),
+    0 0 26px rgba(255,255,255,.5);
+  z-index: 10;
+  animation: povBallFlight 4s cubic-bezier(.45, .05, .55, .95) infinite;
+}
+
+@keyframes povBallFlight {
+  0%, 100% { top: 44%; transform: translate(-50%, -50%) scale(.4); }
+  25%      { top: 60%; transform: translate(-50%, -50%) scale(.8); }
+  50%      { top: 84%; transform: translate(-50%, -50%) scale(1.5); }
+  75%      { top: 60%; transform: translate(-50%, -50%) scale(.8); }
+}
+
+/* Ball shadow on the table */
+.tt-pov-ball-shadow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 10px;
+  height: 4px;
+  margin-left: -5px;
+  margin-top: -2px;
+  border-radius: 50%;
+  background: rgba(0,0,0,.5);
+  filter: blur(2px);
+  z-index: 3;
+  animation: povBallShadow 4s cubic-bezier(.45, .05, .55, .95) infinite;
+}
+@keyframes povBallShadow {
+  0%, 100% { top: 50%; width: 10px; height: 4px; opacity: .3; }
+  25%      { top: 64%; width: 14px; height: 5px; opacity: .5; }
+  50%      { top: 88%; width: 24px; height: 8px; opacity: .8; }
+  75%      { top: 64%; width: 14px; height: 5px; opacity: .5; }
+}
+
+/* ==========================
+   RACKETS — at table edges, in sync with ball
+========================== */
+.tt-pov-racket {
+  position: absolute;
+  filter: drop-shadow(0 8px 6px rgba(0,0,0,.45));
+}
+.tt-pov-racket-blade {
+  position: absolute;
+  border: 3px solid #edc2a1;
+  border-radius: 48% 48% 45% 45%;
+  background:
+    radial-gradient(circle at 30% 25%, #ffa0a6, transparent 40%),
+    linear-gradient(145deg, #f52e42, #a80921);
+  box-shadow:
+    inset 0 3px 7px rgba(255,255,255,.4),
+    inset 0 -3px 8px rgba(60,0,10,.4),
+    0 4px 8px rgba(0,0,0,.35);
+}
+.tt-pov-racket-handle {
+  position: absolute;
+  border-radius: 3px;
+  background: linear-gradient(90deg, #6a3a18 0%, #e9b77e 35%, #bd8050 70%, #5a3010 100%);
+  box-shadow: inset 0 0 4px rgba(0,0,0,.35);
+}
+
+/* Far racket — at far edge of table, hits ball at 0%/100% */
+.tt-pov-racket-far {
+  top: 38%;
+  left: 54%;
+  width: 42px;
+  height: 60px;
+  transform-origin: 50% 100%;
+  z-index: 4;
+  animation: povFarSwing 4s cubic-bezier(.45, .05, .55, .95) infinite;
+}
+.tt-pov-racket-far .tt-pov-racket-blade {
+  top: 0;
+  left: 0;
+  width: 42px;
+  height: 48px;
+}
+.tt-pov-racket-far .tt-pov-racket-handle {
+  top: 44px;
+  left: 50%;
+  width: 8px;
+  height: 22px;
+  transform: translateX(-50%);
+}
+
+@keyframes povFarSwing {
+  0%, 100% { transform: rotate(-22deg) translate(-10px, -4px); }
+  8%       { transform: rotate(2deg) translate(0, 0); }
+  22%      { transform: rotate(22deg) translate(0, 0); }
+  85%      { transform: rotate(22deg) translate(0, 0); }
+  95%      { transform: rotate(-12deg) translate(-6px, -2px); }
+}
+
+/* Near racket — at near edge of table, hits ball at 50% */
+.tt-pov-racket-near {
+  bottom: 14%;
+  left: 44%;
+  width: 110px;
+  height: 160px;
+  transform-origin: 50% 100%;
+  z-index: 7;
+  animation: povNearSwing 4s cubic-bezier(.45, .05, .55, .95) infinite;
+  filter: drop-shadow(0 10px 14px rgba(0,0,0,.55));
+}
+.tt-pov-racket-near .tt-pov-racket-blade {
+  top: 0;
+  left: 0;
+  width: 110px;
+  height: 126px;
+  border-width: 4px;
+}
+.tt-pov-racket-near .tt-pov-racket-handle {
+  top: 118px;
+  left: 50%;
+  width: 14px;
+  height: 48px;
+  transform: translateX(-50%);
+}
+
+@keyframes povNearSwing {
+  0%, 40%   { transform: rotate(-20deg) translate(0, 0); }
+  50%       { transform: rotate(15deg) translate(-8px, -26px); }
+  60%       { transform: rotate(-5deg) translate(0, -10px); }
+  72%, 100% { transform: rotate(-20deg) translate(0, 0); }
+}
+
+/* ==========================
+   RESPONSIVE
+========================== */
+@media (max-width: 767.98px) {
+  .tt-pov-scene { min-height: 440px; }
+  .tt-pov-table { left: 12%; right: 12%; height: 48%; bottom: 7%; }
+  .tt-pov-caption { top: 20px; left: 20px; }
+  .tt-pov-caption h3 { font-size: 1.4rem; }
+  .tt-pov-caption p { font-size: .78rem; }
+  .tt-pov-eyebrow { font-size: .6rem; letter-spacing: 2px; }
+
+  .tt-pov-racket-far { width: 32px; height: 46px; }
+  .tt-pov-racket-far .tt-pov-racket-blade { width: 32px; height: 36px; border-width: 2px; }
+  .tt-pov-racket-far .tt-pov-racket-handle { top: 34px; height: 16px; width: 6px; }
+
+  .tt-pov-racket-near { width: 85px; height: 130px; bottom: 12%; }
+  .tt-pov-racket-near .tt-pov-racket-blade { width: 85px; height: 100px; border-width: 3px; }
+  .tt-pov-racket-near .tt-pov-racket-handle { top: 94px; height: 38px; width: 11px; }
+
+  .tt-pov-ball { width: 14px; height: 14px; margin-left: -7px; margin-top: -7px; }
+}
+
+@media (max-width: 390px) {
+  .tt-pov-scene { min-height: 400px; }
+  .tt-pov-table { left: 8%; right: 8%; height: 46%; }
+  .tt-pov-caption h3 { font-size: 1.2rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tt-pov-light,
+  .tt-pov-ball,
+  .tt-pov-ball-shadow,
+  .tt-pov-racket-far,
+  .tt-pov-racket-near {
+    animation: none !important;
+  }
+  .tt-pov-ball { top: 60%; transform: translate(-50%, -50%) scale(1); }
+  .tt-pov-ball-shadow { top: 64%; }
+}
